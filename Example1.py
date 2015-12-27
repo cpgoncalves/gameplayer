@@ -1,4 +1,4 @@
- Carlos Pedro Gonçalves (2015), Game Theory with Python
+# Carlos Pedro Gonçalves (2015), Game Theory with Python
 # Game Theory and Applied A.I. Classes
 # Instituto Superior de Ciências Sociais e Políticas (ISCSP)
 # University of Lisbon
