@@ -179,30 +179,30 @@ def analyze_matrix(GF):
         # Analyze the system of linear equations
         if mrank(MR[:,:-1]) == mrank(MR) == C.shape[1]:
             print("\nThere is a single solution for row player probabilities")
-            gR='SPD'
+            gR='PDS'
         elif mrank(MR[:,:-1]) == mrank(MR) < C.shape[1]:
             print("\nThere is more than one solution for row player probabilities")
-            gR='SPI'
+            gR='IPS'
         elif mrank(MR[:,:-1]) > mrank(MR):
             print("\nThere is no solution for row player probabilities")
-            gR='SI'
+            gR='IS'
         
         if mrank(MC[:,:-1]) == mrank(MC) == R.shape[1]:
             print("\nThere is a single solution for column player probabilities")
-            gC='SPD'
+            gC='PDS'
         elif mrank(MC[:,:-1]) == mrank(MC) < R.shape[1]:
             print("\nThere is more than one solution for column player probabilities")
-            gC='SPI'
+            gC='IPS'
         elif mrank(MC[:,:-1]) > mrank(MC):
             print("\nThere is no solution for column player probabilities")
-            gC='SI'
+            gC='IS'
         
         
         # If the system is possible definite...
-        if gR == 'SPD' and gC=='SPD':
-            print("\nThere is a single mixed strategies equilibrium")
-            print("Scenario probabilities are well-defined")
+        if gR == 'PDS' and gC=='PDS':
+            print("\nThere is a single solution for linear equations")
             
+            p_valid=True # logical control for valid solution analysis
             
             # calculate the row player's equilibrium probabilities
             print("\nCalculating row player probabilities:")
@@ -214,6 +214,10 @@ def analyze_matrix(GF):
             for i in range(0,len(Row)):
                 print("\nRow player strategy:", Row[i])
                 print("Probability:", P_row[i])
+                if P_row[i] < 0 or P_row[i] > 1:
+                    print("WARNING: PROBABILITY OUTSIDE OF DOMAIN BOUNDS")
+                    print("NO MIXED STRATEGIES EQUILIBRIUM IS PRESENT")
+                    p_valid = False
             
             # calculate the column player's equilibrium probabilities
             print("\nCalculating column player probabilities:")
@@ -226,21 +230,31 @@ def analyze_matrix(GF):
             for i in range(0,len(Row)):
                 print("\nColumn player strategy:", Column[i])
                 print("Probability:", P_column[i])
+                if P_column[i] < 0 or P_column[i] > 1:
+                    print("\nWARNING: PROBABILITY OUTSIDE OF DOMAIN BOUNDS")
+                    print("NO MIXED STRATEGIES EQUILIBRIUM IS PRESENT")
+                    p_valid = False
+            
+            
             
             # extract the scenarios with the strategic configurations
-            # and probabilities
-            scenarios = []
-            
-            for i in range(0,len(Row)):
-                for j in range(0,len(Column)):
-                    scenario=[]
-                    scenario.append(Row[i])
-                    scenario.append(Column[j])
-                    scenario.append(P_row[i]*P_column[j])
-                    scenarios.append(scenario)
-            
-            # place the scenarios as a Pandas dataframe
-            scenarios_df=pd.DataFrame(data=scenarios,columns=['Row Player','Column Player','Probability'])
-            
-            # save the scenarios to Excel file
-            scenarios_df.to_excel('Scenarios.xlsx')
+            # and probabilities if the solution provides for valid
+            # probabilities:
+            if p_valid == True:
+                scenarios = []
+                
+                for i in range(0,len(Row)):
+                    for j in range(0,len(Column)):
+                        scenario=[]
+                        scenario.append(Row[i])
+                        scenario.append(Column[j])
+                        scenario.append(P_row[i]*P_column[j])
+                        scenarios.append(scenario)
+                
+                # place the scenarios as a Pandas dataframe
+                scenarios_df=pd.DataFrame(data=scenarios,columns=['Row Player','Column Player','Probability'])
+                
+                # save the scenarios to Excel file
+                scenarios_df.to_excel('Scenarios.xlsx')
+            else:
+                print("\nNo valid mixed strategies equilibrium was found!")
