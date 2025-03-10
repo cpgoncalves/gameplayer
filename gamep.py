@@ -21,7 +21,8 @@ def addAlternative(strategies,payoffs,config):
 
 def analyzeGame(config,showReasoning):
     AI = gameAI.GameAI(config,[],[]) # instantiate the game AI
-    AI.evaluateGame(showReasoning) # evaluate the game
+    equilibria=AI.evaluateGame(showReasoning) # evaluate the game
+    return equilibria
 
 
 
