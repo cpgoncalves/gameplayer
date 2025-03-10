@@ -123,11 +123,18 @@ def game_analysis(GF):
     
     print("\nRow player plays first")
     gp.showTree(tree_row)
-    gp.evaluateTree(tree_row,plays)
+    RT = gp.evaluateTree(tree_row,plays)
     
     print("\nColumn player plays first")
     gp.showTree(tree_column)
     gp.evaluateTree(tree_column,plays)
+    CT = gp.evaluateTree(tree_row,plays)
+    
+    print("\nFINAL RESULTS FROM SEQUENTIAL ANALYSIS:")
+    print("\nIf Row Player Plays First:")
+    print(RT)
+    print("\nIf Column Player Plays First:")
+    print(CT)
     
     
     # Return the payoff matrices the row and column player's strategies lists
