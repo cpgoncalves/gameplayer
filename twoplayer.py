@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Created on Sat Mar  8 11:25:59 2025
 
@@ -122,31 +121,28 @@ def game_analysis(GF):
     plays = [0,1]
     
     print("\nRow player plays first")
+    
     gp.showTree(tree_row)
-    RT = gp.evaluateTree(tree_row,plays)
+    RTree = gp.evaluateTree(tree_row,plays)
+    
     
     print("\nColumn player plays first")
     gp.showTree(tree_column)
     gp.evaluateTree(tree_column,plays)
-    CT = gp.evaluateTree(tree_row,plays)
+    CTree = gp.evaluateTree(tree_column,plays)
     
-    print("\nFINAL RESULTS FROM SEQUENTIAL ANALYSIS:")
-    print("\nIf Row Player Plays First:")
-    print(RT)
-    print("\nIf Column Player Plays First:")
-    print(CT)
     
     
     # Return the payoff matrices the row and column player's strategies lists
     # and the Nash equilibria
-    return R, C, Row, Column, equilibria
+    return R, C, Row, Column, equilibria, RTree, CTree
 
 
 
 def analyze_matrix(GF):
     
     # Perform the game analysis from the game dataframe
-    R, C, Row, Column, equilibria = game_analysis(GF)
+    R, C, Row, Column, equilibria, RTree, CTree = game_analysis(GF)
     
        
     # Number of columns in the row and column player's strategies
@@ -265,3 +261,17 @@ def analyze_matrix(GF):
                 scenarios_df.to_excel('Scenarios.xlsx')
             else:
                 print("\nNo valid mixed strategies equilibrium was found!")
+    
+    print("\nPure Strategies Synthesis:")
+    print("\nSimultaneous Game Equilibrium:")
+    if len(equilibria) != 0:
+        for element in equilibria:
+            print(element)
+    print("\nSequential Game:")
+    print("\nIf row player plays first:")
+    gp.showTree(RTree)
+    print("\nIf column player plays first:")
+    gp.showTree(CTree)
+    
+    
+    
