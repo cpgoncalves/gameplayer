@@ -78,4 +78,4 @@ class GameAI:
             for element in equilibria:
                 print(element[0], "| payoff:", element[1])
             print("\n")
-                            
+        return equilibria                    
