@@ -186,7 +186,7 @@ def analyze_matrix(GF):
         elif mrank(MR[:,:-1]) == mrank(MR) < C.shape[1]:
             print("\nThere is more than one solution for row player probabilities")
             gR='IPS'
-        elif mrank(MR[:,:-1]) > mrank(MR):
+        elif mrank(MR[:,:-1]) < mrank(MR):
             print("\nThere is no solution for row player probabilities")
             gR='IS'
         
@@ -196,7 +196,7 @@ def analyze_matrix(GF):
         elif mrank(MC[:,:-1]) == mrank(MC) < R.shape[1]:
             print("\nThere is more than one solution for column player probabilities")
             gC='IPS'
-        elif mrank(MC[:,:-1]) > mrank(MC):
+        elif mrank(MC[:,:-1]) < mrank(MC):
             print("\nThere is no solution for column player probabilities")
             gC='IS'
         
