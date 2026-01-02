@@ -1,5 +1,4 @@
 """
-Created on Sat Mar  8 11:25:59 2025
 
 Two-player game analyzer for two player games using Strategy Analyzer
 
@@ -35,58 +34,51 @@ def read_file(filename):
 
 
 
-def game_analysis(GF):
+
+def simultaneous_game_analysis(GF,writer):
     
     # Print the game dataframe and the strategies for each player
-    
+    print("\nSimultaneous Game Analysis")
     print("\nGame Matrix:")
     print(GF)
-    
-    print("\nRow Player Strategies:")
-    Row = list(GF.index)
-    print(Row)
-    
-    print("\nColumn Player Strategies:")
+     
+    # Get the row and column player's strategy names   
+    Row = list(GF.index)    
     Column = list(GF.columns.values)
-    print(Column)
-    
-    lRow= len(Row)
-    lColumn = len(Column)
+
+    lRow= len(Row) # number of strategies for the row player
+    lColumn = len(Column) # number of strategies for the column player
     
     # Extract the numpy array for the game matrix
-    
     GM = np.array(GF,dtype=tuple)
-    
-    
-    config = [] # configuration for simultaneous game
-    tree_row = [] # decision tree for sequential game starting with row player
-    tree_column = [] # decision tree for sequential game starting with column player
     
     # Payoff matrices for R (row) and C (column) players to be used in mixed
     # strategies analysis
     R = np.zeros((lRow,lColumn))
     C = np.zeros((lRow,lColumn))
     
+    # Get the row and column matrices for mixed strategies evaluation
+    R=np.matrix(R)
+    R=R.T
+    C=np.matrix(C)
+    
+    # Number of columns in the row and column player's strategies
+    nR=R.shape[1]
+    nC=C.shape[1]
+
+    
+    config = [] # configuration for simultaneous game
+    
     # For each row and column...
     for i in range(0,lRow):
         for j in range(0,lColumn):
             
-            # extract the strategies for the simultaneous game and for
-            # the sequential game with the row player playing first
-            strategy=[Row[i],Column[j]]
+            # extract the strategies for the simultaneous game
+            strategy=[Row[i],Column[j]]        
             
-            # extract the strategies for the sequential game with the
-            # column player playing first
-            strategy_seq_column=[Column[j],Row[i]]
-            
-            # extract the payoffs for the simultaneous game and for the 
-            # sequential game with the row player playing first
-            payoffs=ast.literal_eval(GM[i][j])
-            
-            # extract the payoffs for the sequential game with the column
-            # player playing first
-            payoffs_seq_column=ast.literal_eval(GM[j][i])
-            
+            # extract the payoffs for the simultaneous game 
+            payoffs=ast.literal_eval(GM[i][j])                    
+                        
             # extract the row and column player payoff matrices for the
             # mixed strategies equilibrium calculation
             R[i,j]=payoffs[0]
@@ -95,14 +87,7 @@ def game_analysis(GF):
             # add alternative strategic configurations for the simultaneous
             # game
             gp.addAlternative(strategy,payoffs,config)
-            
-            # add the tree paths for the alternative sequential games
-            gp.createPath(strategy,payoffs,tree_row)
-            gp.createPath(strategy_seq_column,payoffs_seq_column,tree_column)
-            
     
-    # Print the game scenarios for the simultaneous game in the A.I.'s
-    # working memory
     print("\nGame Scenarios for Simultaneous Game:")
     for scenario in config:
         print(scenario)
@@ -110,48 +95,7 @@ def game_analysis(GF):
     # Calculate the Nash equilibria for the simultaneous game
     equilibria=gp.analyzeGame(config,False)
     
-    # Get the row and column matrices for mixed strategies evaluation
-    R=np.matrix(R)
-    R=R.T
-    C=np.matrix(C)
-    
-    
-    # Sequential analysis if the row and column player plays first
-    print("\nPerforming Sequential Analysis")
-    plays = [0,1]
-    
-    print("\nRow player plays first")
-    
-    gp.showTree(tree_row)
-    RTree = gp.evaluateTree(tree_row,plays)
-    
-    
-    print("\nColumn player plays first")
-    gp.showTree(tree_column)
-    gp.evaluateTree(tree_column,plays)
-    CTree = gp.evaluateTree(tree_column,plays)
-    
-    
-    
-    # Return the payoff matrices the row and column player's strategies lists
-    # and the Nash equilibria
-    return R, C, Row, Column, equilibria, RTree, CTree
-
-
-
-def analyze_matrix(GF):
-    
-    # Perform the game analysis from the game dataframe
-    R, C, Row, Column, equilibria, RTree, CTree = game_analysis(GF)
-    
-       
-    # Number of columns in the row and column player's strategies
-    nR=R.shape[1]
-    nC=C.shape[1]
-    
-    
-    # If the mixed strategies' analysis is requested for scenario probability
-    # calculations
+    # If there are no pure strategies equilibrium or 
     if equilibria == None or len(equilibria) != 1:
         print("\nAnalyzing Mixed Strategies")
         
@@ -186,7 +130,7 @@ def analyze_matrix(GF):
         elif mrank(MR[:,:-1]) == mrank(MR) < C.shape[1]:
             print("\nThere is more than one solution for row player probabilities")
             gR='IPS'
-        elif mrank(MR[:,:-1]) < mrank(MR):
+        elif mrank(MR[:,:-1]) > mrank(MR):
             print("\nThere is no solution for row player probabilities")
             gR='IS'
         
@@ -196,7 +140,7 @@ def analyze_matrix(GF):
         elif mrank(MC[:,:-1]) == mrank(MC) < R.shape[1]:
             print("\nThere is more than one solution for column player probabilities")
             gC='IPS'
-        elif mrank(MC[:,:-1]) < mrank(MC):
+        elif mrank(MC[:,:-1]) > mrank(MC):
             print("\nThere is no solution for column player probabilities")
             gC='IS'
         
@@ -251,27 +195,108 @@ def analyze_matrix(GF):
                         scenario=[]
                         scenario.append(Row[i])
                         scenario.append(Column[j])
+                        scenario.append(P_row[i])
+                        scenario.append(P_column[j])
                         scenario.append(P_row[i]*P_column[j])
                         scenarios.append(scenario)
                 
                 # place the scenarios as a Pandas dataframe
-                scenarios_df=pd.DataFrame(data=scenarios,columns=['Row Player','Column Player','Probability'])
+                scenarios_df=pd.DataFrame(data=scenarios,columns=['Row Player',
+                                                                  'Column Player',
+                                                                  'Row Player Probability',
+                                                                  'Column Player Probability',
+                                                                  'Scenario Probability'])
                 
-                # save the scenarios to Excel file
-                scenarios_df.to_excel('Scenarios.xlsx')
+                # save the scenarios to the Excel file
+                scenarios_df.to_excel(writer, sheet_name="Scenarios", index=False)
             else:
                 print("\nNo valid mixed strategies equilibrium was found!")
     
+    # Save the results to the Excel file
     print("\nPure Strategies Synthesis:")
     print("\nSimultaneous Game Equilibrium:")
     if len(equilibria) != 0:
         for element in equilibria:
             print(element)
-    print("\nSequential Game:")
-    print("\nIf row player plays first:")
-    gp.showTree(RTree)
-    print("\nIf column player plays first:")
-    gp.showTree(CTree)
+        equilibria_df=pd.DataFrame(data=equilibria,columns=["Strategy","Payoffs"])
+        equilibria_df.to_excel(writer, sheet_name="Pure Strategies Equilibria", index=False)
+
+
+
+def sequential_game_analysis(GF,writer):
+    print("\nSequential Game Analysis")
+    
+    tree_row = [] # decision tree for sequential game starting with row player
+    tree_column = [] # decision tree for sequential game starting with column player
+    
+    # Get the row and column player's strategy names and produce the sequence
+    # when the row player plays first and when the column player plays first
+    # to be used in the tree
+    Row = list(GF.index)    
+    Column = list(GF.columns.values)
+    
+    lRow= len(Row) # number of strategies for the row player
+    lColumn = len(Column) # number of strategies for the column player
+    
+    row_first = []
+    column_first = []
+    
+    for strategy_r in Row:
+        for strategy_c in Column:
+            row_first.append([strategy_r,strategy_c])
+    
+    for strategy_c in Column:
+        for strategy_r in Row:
+            column_first.append([strategy_c,strategy_r])
+            
+    # Get the transposed matrix to be used in game analysis when the 
+    # column player plays first
+    GFT = GF.T
+    
+    # Build the game tree when the row player plays first
+    for strategy in row_first:
+        # Get the payoffs
+        payoffs = ast.literal_eval(GF.at[strategy[0],strategy[1]])
+        # Add the game path to the tree
+        gp.createPath(strategy,payoffs,tree_row)
+        
+    # Show the tree when row player plays first
+    print("\nTree when row player plays first:")
+    gp.showTree(tree_row)
+    
+    # Build the game tree when the column player plays first
+    for strategy in column_first:
+        # Get the payoff values in the transposed matrix
+        tuple_value=ast.literal_eval(GFT.at[strategy[0],strategy[1]])
+        # Switch the values because column player plays first
+        payoffs=[tuple_value[1],tuple_value[0]]
+        # Add the game path to the tree
+        gp.createPath(strategy,payoffs,tree_column)
+    
+    # Show the tree when column player plays first
+    print("\nTree when row player plays first:")
+    gp.showTree(tree_column)
+    
+    # Perform the evaluation of both trees
+    plays=[0,1]
+    RTree=gp.evaluateTree(tree_row,plays)
+    CTree=gp.evaluateTree(tree_column,plays)
+    
+    row_path=RTree[0][0][0]+'->'+RTree[0][0][1]
+    column_path=CTree[0][0][0]+'->'+CTree[0][0][1]
+    tree_data=[['Row Player Plays First',row_path,tuple(RTree[0][1])],
+               ['Column Player Plays First',column_path,tuple(CTree[0][1])]]
     
     
+    # Save the results to the Excel file
+    tree_df=pd.DataFrame(data=tree_data,columns=['Play Order','Path','Payoff'])
+    tree_df.to_excel(writer, sheet_name="Sequential Game Equilibria", index=False)
     
+
+
+def analyze_matrix(GF):
+    with pd.ExcelWriter("Synthesis.xlsx", engine="xlsxwriter") as writer:
+        # Perform the game analysis from the game dataframe
+        simultaneous_game_analysis(GF,writer)
+        # Perform the sequential game analysis from the game dataframe
+        sequential_game_analysis(GF,writer)
