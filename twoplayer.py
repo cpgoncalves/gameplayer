@@ -130,7 +130,7 @@ def simultaneous_game_analysis(GF,writer):
         elif mrank(MR[:,:-1]) == mrank(MR) < C.shape[1]:
             print("\nThere is more than one solution for row player probabilities")
             gR='IPS'
-        elif mrank(MR[:,:-1]) > mrank(MR):
+        elif mrank(MR[:,:-1]) < mrank(MR):
             print("\nThere is no solution for row player probabilities")
             gR='IS'
         
@@ -140,7 +140,7 @@ def simultaneous_game_analysis(GF,writer):
         elif mrank(MC[:,:-1]) == mrank(MC) < R.shape[1]:
             print("\nThere is more than one solution for column player probabilities")
             gC='IPS'
-        elif mrank(MC[:,:-1]) > mrank(MC):
+        elif mrank(MC[:,:-1]) < mrank(MC):
             print("\nThere is no solution for column player probabilities")
             gC='IS'
         
@@ -300,3 +300,4 @@ def analyze_matrix(GF):
         simultaneous_game_analysis(GF,writer)
         # Perform the sequential game analysis from the game dataframe
         sequential_game_analysis(GF,writer)
+
