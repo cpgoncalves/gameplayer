@@ -99,6 +99,8 @@ def simultaneous_game_analysis(GF,writer):
     if equilibria == None or len(equilibria) != 1:
         print("\nAnalyzing Mixed Strategies")
         
+        R=R.T # need the original format for the calculation
+        
         # Get the linear equation system's matrices for the row and column
         # players' equilibrium probabilities
         MR = []
