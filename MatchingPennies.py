@@ -25,6 +25,7 @@ extracted from the mixed strategies equilibrium.
 
 import twoplayer as tp
 
-PD = tp.read_file("Matching Pennies.xlsx")
+X = tp.read_file("Matching Pennies.xlsx")
 
-tp.analyze_matrix(PD)
+
+tp.analyze_matrix(X)
