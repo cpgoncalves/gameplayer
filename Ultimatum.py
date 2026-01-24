@@ -18,6 +18,7 @@ games.
 
 import twoplayer as tp
 
-PD = tp.read_file("Ultimatum.xlsx")
+X = tp.read_file("Ultimatum.xlsx")
 
-tp.analyze_matrix(PD)
+
+tp.analyze_matrix(X)
