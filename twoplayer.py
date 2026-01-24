@@ -235,9 +235,6 @@ def sequential_game_analysis(GF,writer):
     Row = list(GF.index)    
     Column = list(GF.columns.values)
     
-    lRow= len(Row) # number of strategies for the row player
-    lColumn = len(Column) # number of strategies for the column player
-    
     row_first = []
     column_first = []
     
@@ -295,9 +292,10 @@ def sequential_game_analysis(GF,writer):
 
 
 def analyze_matrix(GF):
-    with pd.ExcelWriter("Synthesis.xlsx", engine="xlsxwriter") as writer:
+    with pd.ExcelWriter("Synthesis.xlsx") as writer:
         # Perform the game analysis from the game dataframe
         simultaneous_game_analysis(GF,writer)
         # Perform the sequential game analysis from the game dataframe
         sequential_game_analysis(GF,writer)
+
 
