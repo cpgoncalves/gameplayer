@@ -3,7 +3,7 @@ Análise de jogo EUA vs União Europeia com matriz de jogo produzida pelo
 ChatGPT em relação ao problema da Gronelândia. O resultado da análise
 é gravado em ficheiro Synthesis.xlsx.
 
-O jogo, abordage e resultados são cobertos pelo artigo:
+O jogo, a abordagem e os resultados são cobertos pelo artigo:
     
     Gonçalves e Rouco (2026) Aplicação de I.A. Generativa à 
     Cenarização Estratégica com Recurso à Teoria dos Jogos -
@@ -28,5 +28,6 @@ X = tp.read_file("Gronelândia.xlsx")
 
 
 tp.analyze_matrix(X)
+
 
 
